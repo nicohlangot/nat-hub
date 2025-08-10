@@ -1,4 +1,4 @@
--- Nat-Hub Loading Screen - Fullscreen CoreGui Version
+-- Nat-Hub Loading Screen - Fullscreen CoreGui Version (Stuck at 100% Forever)
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
@@ -35,6 +35,83 @@ bgGradient.Color = ColorSequence.new(
 bgGradient.Parent = main
 
 -- Title
+local title = Instance.new("TextLabel")
+title.AnchorPoint = Vector2.new(0.5, 0)
+title.Position = UDim2.new(0.5, 0, 0.3, 0)
+title.Size = UDim2.new(0.8, 0, 0.1, 0)
+title.BackgroundTransparency = 1
+title.Text = "Nat-Hub"
+title.Font = Enum.Font.GothamBold
+title.TextScaled = true
+title.TextColor3 = Color3.fromRGB(255,255,255)
+title.Parent = main
+
+-- Subtitle
+local subtitle = Instance.new("TextLabel")
+subtitle.AnchorPoint = Vector2.new(0.5, 0)
+subtitle.Position = UDim2.new(0.5, 0, 0.38, 0)
+subtitle.Size = UDim2.new(0.8, 0, 0.06, 0)
+subtitle.BackgroundTransparency = 1
+subtitle.Text = "Loading... Please wait"
+subtitle.Font = Enum.Font.Gotham
+subtitle.TextScaled = true
+subtitle.TextColor3 = Color3.fromRGB(230,230,230)
+subtitle.Parent = main
+
+-- Loading bar track
+local barTrack = Instance.new("Frame")
+barTrack.AnchorPoint = Vector2.new(0.5, 0)
+barTrack.Position = UDim2.new(0.5, 0, 0.55, 0)
+barTrack.Size = UDim2.new(0.6, 0, 0.06, 0)
+barTrack.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+barTrack.BorderSizePixel = 0
+barTrack.Parent = main
+Instance.new("UICorner", barTrack).CornerRadius = UDim.new(0, 20)
+
+-- Fill
+local barFill = Instance.new("Frame")
+barFill.Size = UDim2.new(0,0,1,0)
+barFill.BackgroundColor3 = Color3.fromRGB(255,255,255)
+barFill.BorderSizePixel = 0
+barFill.Parent = barTrack
+Instance.new("UICorner", barFill).CornerRadius = UDim.new(0, 20)
+
+-- Percentage inside bar
+local pctText = Instance.new("TextLabel")
+pctText.Size = UDim2.new(1, 0, 1, 0)
+pctText.BackgroundTransparency = 1
+pctText.Font = Enum.Font.GothamBold
+pctText.TextScaled = true
+pctText.TextColor3 = Color3.fromRGB(50,50,50)
+pctText.Text = "0%"
+pctText.Parent = barTrack
+
+-- Logic
+local totalTime = 120 -- 2 minutes to load
+local startTime = tick()
+local finished = false
+
+local function tween(obj, props, dur, style, dir)
+    style = style or Enum.EasingStyle.Quad
+    dir = dir or Enum.EasingDirection.Out
+    TweenService:Create(obj, TweenInfo.new(dur, style, dir), props):Play()
+end
+
+RunService.RenderStepped:Connect(function()
+    if finished then return end
+    local elapsed = tick() - startTime
+    local pct = math.clamp(elapsed / totalTime, 0, 1)
+
+    tween(barFill, {Size = UDim2.new(pct, 0, 1, 0)}, 0.05)
+    pctText.Text = math.floor(pct * 100) .. "%"
+
+    if pct >= 1 then
+        finished = true
+        pctText.Text = "100%"
+        barFill.Size = UDim2.new(1, 0, 1, 0)
+        -- No fade, stays here forever
+    end
+end)-- Title
 local title = Instance.new("TextLabel")
 title.AnchorPoint = Vector2.new(0.5, 0)
 title.Position = UDim2.new(0.5, 0, 0.3, 0)
